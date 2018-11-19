@@ -5,11 +5,10 @@ public class Game
 {
 
 	public final static int GRIDSIZE = 3;
-	final static int PLAYERS = 3;
+	final static int PLAYERS = 5;
 	boolean hitNext = false;
 	static Scanner scan;
 
-	//static int boatSpaces = 3;
 	static int boatSpaces = (int) Math.ceil(GRIDSIZE * GRIDSIZE / 5 * 1.1);
 	public ArrayList<Player> players = new ArrayList<Player>();
 
@@ -88,9 +87,9 @@ public class Game
 		System.out.println("Welcome to Battleships");
 		System.out.println();
 
-		for (int i = 0; i < PLAYERS; i++)
+		for (int i = 1; i <= PLAYERS; i++)
 		{
-			players.add(new Player(i + 1));
+			players.add(new Player(i));
 		}
 		System.out.printf("Game is set to %d players, on a grid size of %d, with %d boats.\n", PLAYERS, GRIDSIZE,
 				players.get(0).getBoats().size());
@@ -135,7 +134,6 @@ public class Game
 		{
 			System.out.print("-");
 		}
-		//System.out.println("\n");
 	}
 
 	public void play()
@@ -149,10 +147,9 @@ public class Game
 				boolean hit = true;
 				while (hit)
 				{
-					//border((i + 1) % players.size());
-					//players.get((i + 1) % players.size()).mapShots.showGrid();
 					showAllGrids();
 					int shotPlayer = 0;
+					int pos = 0;
 					if (hitNext || players.size() == 2)
 					{
 						shotPlayer = (i + 1) % players.size();
@@ -166,13 +163,23 @@ public class Game
 							String input = scan();
 							try
 							{
-								shotPlayer = Integer.parseInt(input) - 1;
-								if (shotPlayer < players.size() && shotPlayer >= 0 && shotPlayer != i)
-									validPlayer = true;
-								else if (shotPlayer == i)
+								shotPlayer = Integer.parseInt(input);
+								for (int j = 0; j < players.size(); j++)
+								{
+									if (players.get(j).getId() == shotPlayer && shotPlayer != players.get(i).getId())
+									{
+										validPlayer = true;
+										pos = j;
+									}
+								}
+								
+								
+								if (validPlayer) {
+								}
+								else if (shotPlayer == players.get(i).getId())
 									System.out.println("Error - Can not shoot yourself... ");
 								else
-									System.out.println("Error - out of range, enter a number less than " + players.size());
+									System.out.println("Error - out of range, enter the number of a remaining player");
 							} catch (Exception e)
 							{
 								System.out.println("Error in input format. Please enter a number, eg \'1\'");
@@ -180,12 +187,12 @@ public class Game
 							}
 						}
 					}
-					System.out.println("Attacking player " + players.get(shotPlayer).getId());
-					hit = players.get(shotPlayer).placeShot(getShotLocation(players.get(shotPlayer)));
-					if (players.get(shotPlayer).getHits() == boatSpaces)
+					System.out.println("Attacking player " + shotPlayer);
+					hit = players.get(pos).placeShot(getShotLocation(players.get(pos)));
+					if (players.get(pos).getHits() == boatSpaces)
 					{
-						System.out.printf("Player %d's fleet has been destroyed!\n", players.get(shotPlayer).getId());
-						players.remove(shotPlayer);
+						System.out.printf("Player %d's fleet has been destroyed!\n", players.get(pos).getId());
+						players.remove(pos);
 						//i--;
 						if (players.size() == 1)
 							winner = true;
